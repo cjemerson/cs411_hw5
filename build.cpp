@@ -15,18 +15,56 @@
 
 /***** FUNCTION DECLARATIONS *****/
 
-// Workhorse function (RECURSIVE)
-// *** Default arguments specified here. ***
-// (definition and documentation below)
-int build_recurse(const std::vector<std::vector<int>> & bridges,
-    int i = 0, int nextWestCity = 0, int nextEastCity = 0);
-
 // Helper function
 // (definition and documentation below)
 void sortAndCull(std::vector<std::vector<int>> & bridges);
 
+/***** HELPER CLASS DECLARATION *****/
+// DynProgrammingBuildContext Class Declaration
+// Maintains a list of memorized results
+class DynProgrammingBuildContext
+{
+public:
+    // Changes ownership of bridges and creates empty list of memoized results
+    DynProgrammingBuildContext(std::vector<std::vector<int>> && bridges)
+        : _memoizedResults(bridges.size(), 0),
+          _bridges{}
+    {
+        std::swap(_bridges, bridges);
+        sortAndCull(_bridges);
+    }
 
-/***** WRAPPER FUNCTION DEFINITION *****/
+    // Public Interface
+    // Wrapper Function for build_recurse()
+    inline int build()
+    {
+        return build_recurse();
+    }
+
+private:
+    // Memoization Functions
+    inline int getMemoizedResult(int i) const
+    {
+        return _memoizedResults[i];
+    }
+
+    inline void setMemoizedResult(int i, int value)
+    {
+        _memoizedResults[i] = value;
+    }
+
+    // Workhorse function (RECURSIVE)
+    // *** Default arguments specified here. ***
+    // (definition and documentation below)
+    int build_recurse(int i = 0, int nextWestCity = 0, int nextEastCity = 0);
+
+private:
+    std::vector<int> _memoizedResults;
+    std::vector<std::vector<int>> _bridges;
+};
+
+
+/***** PUBLIC INTERFACE FUNCTION DEFINITION *****/
 
 // build - Wrapper function (RECURSIVE)
 // Finds the maximum cumulative toll possible for a given a set of
@@ -47,10 +85,9 @@ int build(int w, int e, std::vector<std::vector<int>> bridges)
 {
     (void) w, (void) e; // To suppress -Wunused-parameter
 
-    // Sorts bridges to make use of invariants and remove duplicates.
-    sortAndCull(bridges);
+    DynProgrammingBuildContext solution(std::move(bridges));
 
-    return build_recurse(bridges);
+    return solution.build();
 }
 
 
@@ -69,15 +106,16 @@ int build(int w, int e, std::vector<std::vector<int>> bridges)
 // Preconditions:
 //   * i, nextWestCity and nextEastCity are initially zero
 //      (in the first recursive call).
-//   * bridges is sorted according to sortAndCull()
+//   * _bridges is sorted according to sortAndCull()
+//   * _memoizedResult is filled with zeroes
 // Invariants:
 //   * [nextWestCity, max West City] is available for a bridge or
 //      nextWestCity > max West city.
 //   * [nextEastCity, max East City] is available for a bridge or
 //      nextEastCity > max East city.
-int build_recurse(const std::vector<std::vector<int>> & bridges, int i, int nextWestCity, int nextEastCity)
+int DynProgrammingBuildContext::build_recurse(int i, int nextWestCity, int nextEastCity)
 {
-    const int BRIDGES_SIZE = int(bridges.size());
+    const int BRIDGES_SIZE = int(_bridges.size());
 
     // If we are at the end of the bridges
     if (i >= BRIDGES_SIZE)
@@ -86,19 +124,26 @@ int build_recurse(const std::vector<std::vector<int>> & bridges, int i, int next
     }
 
     auto max_toll = 0;
-    auto current_w = bridges[i][0];
-    auto current_e = bridges[i][1];
+    auto current_w = _bridges[i][0];
+    auto current_e = _bridges[i][1];
 
     // If we can place a bridge
     if (current_w >= nextWestCity && current_e >= nextEastCity)
     {
-        // Try with the bridge
-        auto temp = bridges[i][2] + build_recurse(bridges, i + 1, current_w + 1, current_e + 1);
-        max_toll = (max_toll < temp)? temp : max_toll;
+        // Use the memoized result if we have it
+        if ( !(max_toll = getMemoizedResult(i)) )
+        {
+            // Try with the bridge
+            auto temp = _bridges[i][2] + build_recurse(i + 1, current_w + 1, current_e + 1);
+            max_toll = (max_toll < temp)? temp : max_toll;
+
+            // Save the result (using this bridge)
+            setMemoizedResult(i, max_toll);
+        }
     }
 
     // Try without the bridge
-    auto temp = build_recurse(bridges, i + 1, nextWestCity, nextEastCity);
+    auto temp = build_recurse(i + 1, nextWestCity, nextEastCity);
     max_toll = (max_toll < temp)? temp : max_toll;
 
     return max_toll;
