@@ -1,13 +1,16 @@
 // build.cpp
 // Charles Emerson
-// 23 September 2019
-// Updated: 23 September 2019
+// Created: 23 September 2019
+// Updated: 13 September 2019
 //
 // For CS 411 Fall 2019
 // Source for function build
-// Solution for Assignment 2, Exercise A
+// Solution to Assignment 5, Exercise A
+//
+// This is a fork from my solution for Assignment 2, Exercise A
+// https://github.com/cjemerson/cs411_hw5/
 
-#include "build.h"
+#include "build.hpp"
 
 
 /***** FUNCTION DECLARATIONS *****/

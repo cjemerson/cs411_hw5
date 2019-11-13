@@ -1,11 +1,14 @@
-// build.h
+// build.hpp
 // Charles Emerson
-// 21 September 2019
-// Updated: 23 September 2019
+// Created: 21 September 2019
+// Updated: 13 September 2019
 //
 // For CS 411 Fall 2019
 // Header for function build
-// Solution for Assignment 2, Exercise A
+// Solution to Assignment 5, Exercise A
+//
+// This is a fork from my solution for Assignment 2, Exercise A
+// https://github.com/cjemerson/cs411_hw5/
 
 
 #ifndef FILE_BUILD_H_INCLUDED
