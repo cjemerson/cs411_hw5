@@ -19,8 +19,8 @@ Remove each bridge that has the same West and East city of the previous bridge
 Recurse on the set of bridges, using the stack to hold the index of the current bridge under consideration, and the next highest West and East cities available to build a bridge from 
   1. If we are at the end of the set of bridges, then return 0
   2. If we can build the current bridge
-    1. If we have memoized the result, then use the saved maximum toll of using the bridge
-    2. Otherwise, try with the bridge and save the result
+     1. If we have memoized the result, then use the saved maximum toll of using the bridge
+     2. Otherwise, try with the bridge and save the result
   3. Try without the bridge
   4. Return the maximum cumulative toll found
 
